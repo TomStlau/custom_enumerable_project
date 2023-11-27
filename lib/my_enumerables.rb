@@ -1,6 +1,63 @@
 module Enumerable
   # Your code goes here
 
+
+
+  def my_map
+    result = []
+    self.my_each do |item|
+      result << yield(item)
+    end
+    result
+  end
+
+  def my_inject(arg = nil)
+    if block_given?
+      if arg.nil?
+        result = self[0]
+        self[1..-1].my_each do |item|
+          result = yield(result, item)
+        end
+      else
+        result = arg
+        self.my_each do |item|
+          result = yield(result, item)
+        end
+      end
+    else
+      if arg.nil?
+        result = self[0]
+        self[1..-1].my_each do |item|
+          result = result.send(:*, item)
+        end
+      else
+        result = arg
+        self.my_each do |item|
+          result = result.send(:*, item)
+        end
+      end
+    end
+    result
+  end
+
+  def my_count(arg = nil)
+    if block_given?
+      count = 0
+      self.my_each do |item|
+        count += 1 if yield(item)
+      end
+      count
+    elsif arg.nil?
+      length
+    else
+      count = 0
+      self.my_each do |item|
+        count += 1 if item == arg
+      end
+      count
+    end
+  end
+
   def my_each_with_index
     length.times do |index|
       yield(self[index], index)
@@ -21,12 +78,7 @@ module Enumerable
     false
   end
 
-  def my_each
-    for i in self
-      yield(i)
-    end
-    self
-  end
+
 
   def my_all?(arg = nil)
     if block_given?
@@ -48,5 +100,11 @@ end
 # your enumerable module will have access
 # to this method
 class Array
+  def my_each
+    for i in self
+      yield(i)
+    end
+    self
+  end
   # Define my_each here
 end
