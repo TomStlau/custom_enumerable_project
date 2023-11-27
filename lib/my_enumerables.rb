@@ -1,7 +1,26 @@
 module Enumerable
   # Your code goes here
 
+  def my_select
+    result = []
+    self.my_each do |item|
+      result << item if yield(item)
+    end
+    result
+  end
 
+  def my_none?(arg = nil)
+    if block_given?
+      self.my_each do |item|
+        return false if yield(item)
+      end
+    else
+      self.my_each do |item|
+        return false if item
+      end
+    end
+    true
+  end
 
   def my_map
     result = []
