@@ -3,111 +3,74 @@ module Enumerable
 
   def my_select
     result = []
-    self.my_each do |item|
-      result << item if yield(item)
-    end
+    my_each  { |item| result << item if yield(item) }
     result
   end
 
-  def my_none?(arg = nil)
+  def my_none?
     if block_given?
-      self.my_each do |item|
-        return false if yield(item)
-      end
+      my_each { |item| return false if yield(item) }
     else
-      self.my_each do |item|
-        return false if item
-      end
+      my_each { |item| return false if item }
     end
     true
   end
 
   def my_map
     result = []
-    self.my_each do |item|
-      result << yield(item)
-    end
+    my_each { |item| result << yield(item) }
     result
   end
 
   def my_inject(arg = nil)
-    if block_given?
-      if arg.nil?
-        result = self[0]
-        self[1..-1].my_each do |item|
-          result = yield(result, item)
-        end
-      else
-        result = arg
-        self.my_each do |item|
-          result = yield(result, item)
-        end
-      end
-    else
-      if arg.nil?
-        result = self[0]
-        self[1..-1].my_each do |item|
-          result = result.send(:*, item)
-        end
-      else
-        result = arg
-        self.my_each do |item|
-          result = result.send(:*, item)
-        end
-      end
-    end
+    result = arg || self[0]
+    array = arg ? self : self[1..-1]
+
+    array.my_each { |item|
+      result = if block_given?
+                 yield(result, item)
+               else
+                 result.send(:*, item)
+               end
+    }
     result
   end
 
   def my_count(arg = nil)
     if block_given?
       count = 0
-      self.my_each do |item|
-        count += 1 if yield(item)
-      end
+      my_each { |item| count += 1 if yield(item) }
       count
     elsif arg.nil?
       length
     else
       count = 0
-      self.my_each do |item|
-        count += 1 if item == arg
-      end
+      my_each { |item| count += 1 if item == arg }
       count
     end
   end
 
   def my_each_with_index
-    length.times do |index|
-      yield(self[index], index)
-    end
+    length.times { |index| yield(self[index], index) }
     self
   end
 
-  def my_any?(arg = nil)
+  def my_any?
     if block_given?
-      self.my_each do |item|
-        return true if yield(item)
-      end
-    else
-      self.my_each do |item|
-        return true if item
-      end
+      my_each { |item| return true if yield(item) }
+        else
+      my_each { |item| return true if item }
     end
     false
   end
 
 
 
-  def my_all?(arg = nil)
+  def my_all?
     if block_given?
-      self.my_each do |item|
-        return false unless yield(item)
-      end
+      my_each { |item| return false unless yield(item) }
     else
-      self.my_each do |item|
-        return false unless item
-      end
+      my_each { |item| return false unless item }
     end
     true
 
